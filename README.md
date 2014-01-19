@@ -1,4 +1,4 @@
-scratchcard
+Scratchcard
 ===========
 
 A scratch card library based on canvas.
