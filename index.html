@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8;">
+		<title>Radarcharts Guide</title>
+		<link rel="stylesheet" type="text/css" href="css/all.css">
+		<script type="text/javascript" src="js/jquery-1.7.min.js"></script>
+		<script type="text/javascript" src="js/scratchcard.js"></script>
+	</head>
+	<body style="margin: 100px 10%;">
+		<article style="margin: 0; padding: 0;">
+			<h1 class="mb-l">刮刮卡小封装</h1>
+			<p>使用 Canvas 实现的刮刮卡小封装。</p>
+			<p>A scratch card library based on canvas.</p>
+			<p class="mt-m"><a target="_blank" href="https://github.com/kikoshoung/radarcharts">Fork me on github</a></p>
+			<section>
+			    <div id="container-scratchcard" style="width: 240px; height: 180px; background: #E0E0E0; text-align: center; line-height: 180px;">正在生成刮刮卡...</div>
+			    <div>
+			        <button class="btn mt-m" id="btn-again">再来一张试试</button>
+			    </div>
+			</section>
+			<section>
+			    <h2>使用方法</h2>
+			    <ol class="decorated">
+			        <li>在页面内引入 <a target="_blank" href="https://raw.github.com/kikoshoung/radarcharts/master/minified/radarcharts.min.js">scratchcard.min.js</a> 或 <a target="_blank" href="https://raw.github.com/kikoshoung/radarcharts/master/js/radarcharts.js">scratchcard.js</a>。</li>
+			        <li>然后，在页面内放置你的 DOM 容器，如：&lt;div id="container-scratchcard"&gt;&lt;/div&gt;。</li>
+			        <li>最后，构造一个 ScratchCard 实例：</li>
+			    </ol>
+			    <pre>
+			        <code>
+	// 一些铺垫设置
+	var resImg = ['img/face-smile.png', 'img/face-sad.png'],
+	    container = $('#container-scratchcard'),
+	    won = Math.random() > 0.5 ? true : false,
+	    scratchCard;
+
+	// 构造一个 ScratchCard 实例
+	scratchCard = new ScratchCard({
+	    container: container[0],
+	    imgSrc: won ? resImg[0] : resImg[1],
+	    size: [240, 180],
+	    validArea: [45, 15, 150, 150],
+	    percentage: 0.4,
+	    scratchLayer: {
+	        text: '骚年，快刮我~',
+	    },
+	    onScratch: function(progress) {
+	        console.log(progress);
+	    },
+	    onComplete: function() {
+	        if (won) alert('我去，中奖了！')
+	    }
+	});
+			        </code>
+			    </pre>
+			</section>
+			<section>
+			    <h2>Tips</h2>
+			    <ul class="decorated">
+			        <li>options 中的 validArea 是我们设定的一个刮奖有效区域，该区域可根据你得图片结构来设定。</li>
+			        <li>options 中的 percentage 是在有效区域内计算得到的一个已经刮去像素的百分比。</li>
+			        <li>options 中的 onScratch 属性应该是一个函数，该函数接受内部传来的 progress 参数，即刮刮卡的刮去百分比。</li>
+			        <li>options 中的 onComplete 属性也应该是一个函数，该函数会在刮到我们设定的一个百分比（percentage）时调用。</li>
+			        <li>如需移除一个 ScratchCard 实例，建议使用提供的 destroy 方法（如 scratchCard.destroy() ），该方法不仅会移除 container 中的 DOM 元素，还会移除在这些 DOM 元素上绑定的事件处理程序。</li>
+			        <li>jQuery 用户可以这样使用 ScratchCard 来初始一个图表：$('#container').ScratchCard(options)<br/>这样使用的话，options 中就不用再传入 container 了。</li>
+			    </ul>
+			</section>
+
+			<section>
+			    <h2>参数表详细</h2>
+			    <p>以下是 ScratchCard 的默认参数配置，您可以依据自己的喜好在实例化的时候传入不同参数 override 它。</p>
+			    <pre>
+			        <code>
+	defaults: {
+	    // A wrapper element for scratch card, must be an original dom object
+	    container: null,
+
+	    // Image src for win or not
+	    imgSrc: '',
+
+	    // Card size, [{width}, {height}]
+	    size: [240, 180],
+
+	    // Valid scratch area, [{left}, {top}, {width}, {hight}]
+	    // Defaults to [0, 0, {cardWidth}, {cardHeight}]
+	    // validArea: [0, 0, {cardWidth}, {cardWidth}],
+
+	    // Percentage of valid scratched pixels, based on valid area
+	    percentage: 0.6,
+
+	    // Scratch layer's property
+	    scratchLayer: {
+	        background: '#e0e0e0',
+	        text: '刮开此涂层',
+	        color: '#888',
+	        font: '30px Verdana',
+
+	        // Scratch width
+	        lineWidth: 30,
+	    },
+
+	    // Text to show when users' browser does not support canvas
+	    notSupportText: 'Sorry, your browser dose not support [Canvas], please use a higher version browser and try again.',
+
+	    // A callback function, invoked after a scratch action
+	    onScratch: null,
+
+	    // A callback function, invoked when scratch completed
+	    onComplete: null,
+	}
+			        </code>
+			    </pre>
+			</section>
+
+			<script type="text/javascript">
+			    var resImg = ['img/face-smile.png', 'img/face-sad.png'],
+			        container = $('#container-scratchcard'),
+			        btnAgain = $('#btn-again'),
+			        isPC = ('ontouchstart' in window) ? false : true,
+			        events = {
+			            click: isPC ? 'click' : 'touchstart',
+			            mousemove: isPC ? 'mousemove' : 'touchmove'
+			        },
+			        scratchCard;
+
+			    function addScratchCard(){
+			        var won = Math.random() > 0.5 ? true : false;
+
+			        container.html('正在生成刮刮卡...');
+			        scratchCard = new ScratchCard({
+			            container: container[0],
+			            imgSrc: won ? resImg[0] : resImg[1],
+			            size: [240, 180],
+			            validArea: [45, 15, 150, 150],
+			            percentage: 0.4,
+			            scratchLayer: {
+			                text: '骚年，快刮我~',
+			            },
+			            onScratch: function(progress) {
+			                console.log(progress);
+			            },
+			            onComplete: function() {
+			                if (won) alert('我去，中奖了！')
+			            }
+			        });
+			    }
+
+			    btnAgain.on(events['click'], function(e){
+			        scratchCard && scratchCard.destroy();
+			        addScratchCard();
+			    });
+
+			    // $(document).on(events['mousemove'], function(e){
+			    //     e.preventDefault();
+			    // });
+
+			    addScratchCard();
+			</script>
+
+			<script type="text/javascript">
+				function codeareaHandler(area){
+					area.each(function(){
+						var thisArea = $(this),
+							codeStr = $.trim(thisArea.text()),
+							codeRows = codeStr.match(/((.*)\n|\n?(.*)\n?)/g),
+							codeRows = codeRows.slice(0, codeRows.length - 1), // ugly method!
+							len = codeRows.length,
+							rowList = '<ul class="code-row-list">',
+							handledCodeStr = '';
+
+						for(var i = 1; i <= len; i++){
+							handledCodeStr += '<p><span class="num">'+ i +'</span>'+ codeRows[i - 1] +'</p>';
+						}
+						rowList += '</ul>';
+						handledCodeStr = '<code>'+ handledCodeStr +'</code>';
+						thisArea.html(handledCodeStr);
+					})
+				}
+				codeareaHandler($('body').find('pre'));
+			</script>
+		</article>
+	</body>
+</html>
