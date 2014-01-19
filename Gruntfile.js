@@ -10,7 +10,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    'minified/scratchcard.min.js': 'js/scratchcard.js'
+                    'js/scratchcard.min.js': 'js/scratchcard.js'
                 }
             }
         }
