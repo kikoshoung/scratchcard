@@ -261,7 +261,7 @@
 				throw new Error(options.notSupportText);
 			}
 
-			this.canvasOffset = getOffset(canvas);
+			// this.canvasOffset = getOffset(canvas);
 
 			ctx.globalCompositeOperation = "source-over";
 
@@ -314,7 +314,9 @@
 
 		mousedownHandler: function(e){
 			var ctx = this.ctx,
-				canvasOffset = this.canvasOffset,
+				canvas = this.canvas,
+				// In case canvas' position changed
+				canvasOffset = this.canvasOffset || (this.canvasOffset = getOffset(canvas)),
 				pageCoordinate = this.getCoordinate(e);
 
 			this.scratchActivated = true;
