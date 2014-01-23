@@ -10,36 +10,42 @@
 		this.scratchActivated = false;
 		this.extendOptions();
 		this.initialize();
-	};
-
-	function clone(original){
-        if(typeof original != 'object' || !original || original.nodeType) return original;
-
-        var clonedObject = original.constructor === Array ? [] : {};
-
-        for(var i in original){
-        	clonedObject[i] = arguments.callee(original[i])
-        }
-
-        return clonedObject;
 	}
 
-	function extend(target, defaults){
-        var extended = clone(defaults);
+	// clone an object deeply
+	function clone(obj){
+		// If obj is not an Object instance, return it. Except null and DOM object.
+		if(typeof obj != 'object' || obj == null || obj.nodeType) return obj;
 
-        for(var j in target){
-            if(extended[j] instanceof Object && target[j]){
-                if(extended[j] instanceof Array){
-                        extended[j] = clone(target[j]);
-                } else {
-                        extended[j] = arguments.callee(target[j], extended[j]);
-                }
-            } else {
-                extended[j] = target[j];
-            }
-        }
-        return extended;
-	};
+		var clonedObj = obj.constructor === Array ? [] : {};
+
+		for(var prop in obj){
+			clonedObj[prop] = arguments.callee(obj[prop]);
+		}
+
+		return clonedObj;
+	}
+
+	// extend origin object with default options object 
+	function extend(origin, options){
+		var extendedOpt = clone(options);
+			origin = origin || {};
+			options = options || {};
+
+		for(var prop in origin){
+			if(origin[prop] instanceof Object && !origin[prop].nodeType){
+				if(origin[prop] instanceof Array || origin[prop] instanceof Function){
+					extendedOpt[prop] = clone(origin[prop]);
+				} else {
+					extendedOpt[prop] = arguments.callee(origin[prop], extendedOpt[prop]);
+				}
+			} else {
+				extendedOpt[prop] = origin[prop];
+			}
+		}
+
+		return extendedOpt;
+	}
 
 	function getOffset(elem){
 		var offset = [elem.offsetLeft, elem.offsetTop],
@@ -52,7 +58,33 @@
 		}
 
 		return offset;
-	};
+	}
+
+	function addEvent(elem, eventName, callback){
+		if(document.addEventListener){
+			elem.addEventListener(eventName, callback, false);
+		} else if(document.attachEvent){
+			elem.attachEvent('on' + eventName, callback);
+		} else {
+			elem['on' + eventName] = callback; 
+		}
+	}
+
+	function removeEvent(elem, eventName, callback){
+		if(document.removeEventListener){
+			elem.removeEventListener(eventName, callback, false);
+		} else if(document.detachEvent){
+			elem.detachEvent('on' + eventName, callback);
+		} else {
+			elem['on' + eventName] = null; 
+		}
+	}
+
+	function bind(fnuc, context){
+		return function(){
+			fnuc.apply(context, arguments);
+		}
+	}
 
 	// prototype of constructor ScratchCard
 	ScratchCard.prototype = {
@@ -82,17 +114,17 @@
 		        font: '30px Verdana',
 
 		        // Scratch width
-		        lineWidth: 30,
+		        lineWidth: 30
 		    },
 
 		    // Text to show when users' browser does not support canvas
-		    notSupportText: 'Sorry, your browser dose not support [Canvas], please use a higher version browser and try again.',
+		    notSupportText: 'Sorry, [Canvas] is not supported.',
 
 		    // A callback function, invoked after a scratch action
             onScratch: null,
 
             // A callback function, invoked when scratch completed
-            onComplete: null,
+            onComplete: null
 		},
 
 		events: {
@@ -128,7 +160,7 @@
 				percentage = options.percentage;
 
 			if(!(container && container.nodeType && container.nodeType == 1)){
-				throw new Error('Param [container] must be given and must be a dom element.');
+				throw new Error('Param [container] must be given and must be a original dom element.');
 				return false;
 			}
 
@@ -159,7 +191,7 @@
 		setContainer: function(options){
 			var container = options.container,
 				curSize = this.curSize,
-				cssText = 'display: inline-block; position: relative;';
+				cssText = container.style.cssText + 'display: inline-block; position: relative; background: transparent;';
 
 			container.innerHTML = '';
 			container.style.cssText = cssText;
@@ -244,8 +276,21 @@
 		},
 
 		getCoordinate: function(event){
+			var pageX, pageY;
+
 			if(event.targetTouches) event = event.targetTouches[0];
-			return [event.pageX, event.pageY];
+			pageX = event.pageX;
+			pageY = event.pageY;
+
+			// For IE8 and older browsers
+			if(pageX === undefined){
+				pageX = event.clientX + (document.body.scrollLeft || document.documentElement.scrollLeft);
+			}
+			if(pageY === undefined){
+				pageY = event.clientY + (document.body.scrollTop || document.documentElement.scrollTop);
+			}
+
+			return [pageX, pageY];
 		},
 
 		initCanvas: function(){
@@ -283,53 +328,23 @@
 			ctx.lineWidth = scratchLayer.lineWidth; 
 		},
 
-		addEvent: function(elem, eventName, callback){
-			if(document.addEventListener){
-				elem.addEventListener(eventName, callback, false);
-			} else if(document.attachEvent){
-				elem.attachEvent('on' + eventName, callback);
-			} else {
-				elem['on' + eventName] = callback; 
-			}
-		},
-
-		removeEvent: function(elem, eventName, callback){
-			if(document.removeEventListener){
-				elem.removeEventListener(eventName, callback, false);
-			} else if(document.attachEvent){
-				elem.detachEvent('on' + eventName, callback);
-			} else {
-				elem['on' + eventName] = null; 
-			}
-		},
-
 		bindEvents: function(){
 			var canvas = this.canvas,
 				container = this.container,
 				events = this.events,
 				self = this;
 
-			canvas.addEventListener(events['mousedown'], function(e){
-				self.mousedownHandler(e);
-			});
+			this.onmousedown = bind(this.mousedownHandler, this);
+			this.onmousemove = bind(this.mousemoveHandler, this);
+			this.onmouseup = bind(this.mouseupHandler, this);
+			this.onmouseout = bind(this.mouseoutHandler, this);
+			this.onmousemoveContainer = bind(this.mousemoveContainerHandler, this);
 
-			canvas.addEventListener(events['mousemove'], function(e){
-				self.mousemoveHandler(e);
-			});
-
-			canvas.addEventListener(events['mouseup'], function(e){
-				self.mouseupHandler(e);
-				self.isOktoShowAll(self.getScratchedPercentage());
-			});
-
-			canvas.addEventListener('mouseout', function(e){
-				// self.mouseupHandler(e);
-				self.mouseoutHandler(e);
-			});
-
-			container.addEventListener(events['mousemove'], function(e){
-				e.preventDefault();
-			});
+			addEvent(canvas, events['mousedown'], this.onmousedown);
+			addEvent(canvas, events['mousemove'], this.onmousemove);
+			addEvent(canvas, events['mouseup'], this.onmouseup);
+			addEvent(canvas, 'mouseout', this.onmouseout);
+			addEvent(container, events['mousemove'], this.onmousemoveContainer);
 		},
 
 		mousedownHandler: function(e){
@@ -369,11 +384,16 @@
 
 			this.scratchActivated = false;
 			ctx.closePath();
-			onScratch && onScratch(this.getScratchedPercentage());			
+			onScratch && onScratch(this.getScratchedPercentage());		
+			this.isOktoShowAll(this.getScratchedPercentage());
 		},
 
 		mouseoutHandler: function(e){
 			this.scratchActivated = false;
+		},
+
+		mousemoveContainerHandler: function(e){
+			e.preventDefault();
 		},
 
 		isOktoShowAll: function(curPercentage){
@@ -395,16 +415,26 @@
 				canvas = this.canvas,
 				img = this.img;
 
+			removeEvent(canvas, events['mousedown'], this.onmousedown);
+			removeEvent(canvas, events['mousemove'], this.onmousemove);
+			removeEvent(canvas, events['mouseup'], this.onmouseup);
+			removeEvent(canvas, 'mouseout', this.onmouseout);
+			removeEvent(container, events['mousemove'], this.onmousemoveContainer);
+			img.onload = null;
+
 			container.removeChild(canvas);
 			container.removeChild(img);
-
-			canvas.removeEventListener(events['mousedown']);
-			canvas.removeEventListener(events['mousemove']);
-			canvas.removeEventListener(events['mouseup']);
-			canvas.removeEventListener('mouseout');
-			container.removeEventListener(events['mousemove']);
 		}
 	};
 
+	// Export ScratchCard to window object
 	window.ScratchCard = ScratchCard;
+
+	// Export to $.fn for jQuery coding style
+	if(window.jQuery){
+		$.fn.ScratchCard = function(options){
+			options.container = $(this)[0];
+			return new ScratchCard(options);
+		}
+	}
 })();

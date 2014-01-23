@@ -14,8 +14,10 @@
 			<p>A scratch card library based on canvas.</p>
 			<p class="mt-m"><a target="_blank" href="https://github.com/kikoshoung/radarcharts">Fork me on github</a></p>
 			<section>
-			    <div id="container-scratchcard" style="width: 240px; height: 180px; background: #E0E0E0; text-align: center; line-height: 180px;">正在生成刮刮卡...</div>
-			    <div>
+			    <div class="c-box mb-m" style="width: 240px;">
+			        <div style="width: 240px; height: 180px;">
+			            <div id="container-scratchcard" style="line-height: 180px; text-align: center; background: #E0E0E0;">正在生成刮刮卡...</div>
+			        </div>
 			        <button class="btn mt-m" id="btn-again">再来一张试试</button>
 			    </div>
 			</section>
@@ -100,7 +102,7 @@
 	    },
 
 	    // Text to show when users' browser does not support canvas
-	    notSupportText: 'Sorry, your browser dose not support [Canvas], please use a higher version browser and try again.',
+	    notSupportText: 'Sorry, [Canvas] not supported [Canvas], please use a higher version browser and try again.',
 
 	    // A callback function, invoked after a scratch action
 	    onScratch: null,
@@ -134,7 +136,7 @@
 			            validArea: [45, 15, 150, 150],
 			            percentage: 0.4,
 			            scratchLayer: {
-			                text: '骚年，快刮我~',
+			                text: '骚年，快刮我~'
 			            },
 			            onScratch: function(progress) {
 			                console.log(progress);
@@ -143,6 +145,21 @@
 			                if (won) alert('我去，中奖了！')
 			            }
 			        });
+					// scratchCard = container.ScratchCard({
+			  //           imgSrc: won ? resImg[0] : resImg[1],
+			  //           size: [240, 180],
+			  //           validArea: [45, 15, 150, 150],
+			  //           percentage: 0.4,
+			  //           scratchLayer: {
+			  //               text: '骚年，快刮我~'
+			  //           },
+			  //           onScratch: function(progress) {
+			  //               console.log(progress);
+			  //           },
+			  //           onComplete: function() {
+			  //               if (won) alert('我去，中奖了！')
+			  //           }
+			  //   	});
 			    }
 
 			    btnAgain.on(events['click'], function(e){
