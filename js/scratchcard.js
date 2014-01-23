@@ -334,17 +334,17 @@
 				events = this.events,
 				self = this;
 
-			this.onmousedown = bind(this.mousedownHandler, this);
-			this.onmousemove = bind(this.mousemoveHandler, this);
-			this.onmouseup = bind(this.mouseupHandler, this);
-			this.onmouseout = bind(this.mouseoutHandler, this);
-			this.onmousemoveContainer = bind(this.mousemoveContainerHandler, this);
+			var md = this.onmousedown = bind(this.mousedownHandler, this);
+			var mm = this.onmousemove = bind(this.mousemoveHandler, this);
+			var mu = this.onmouseup = bind(this.mouseupHandler, this);
+			var mo = this.onmouseout = bind(this.mouseoutHandler, this);
+			var mmContainer = this.onmousemoveContainer = bind(this.mousemoveContainerHandler, this);
 
-			addEvent(canvas, events['mousedown'], this.onmousedown);
-			addEvent(canvas, events['mousemove'], this.onmousemove);
-			addEvent(canvas, events['mouseup'], this.onmouseup);
-			addEvent(canvas, 'mouseout', this.onmouseout);
-			addEvent(container, events['mousemove'], this.onmousemoveContainer);
+			addEvent(canvas, events['mousedown'], md);
+			addEvent(canvas, events['mousemove'], mm);
+			addEvent(canvas, events['mouseup'], mu);
+			addEvent(canvas, 'mouseout', mo);
+			addEvent(container, events['mousemove'], mmContainer);
 		},
 
 		mousedownHandler: function(e){
