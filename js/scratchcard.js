@@ -283,6 +283,26 @@
 			ctx.lineWidth = scratchLayer.lineWidth; 
 		},
 
+		addEvent: function(elem, eventName, callback){
+			if(document.addEventListener){
+				elem.addEventListener(eventName, callback, false);
+			} else if(document.attachEvent){
+				elem.attachEvent('on' + eventName, callback);
+			} else {
+				elem['on' + eventName] = callback; 
+			}
+		},
+
+		removeEvent: function(elem, eventName, callback){
+			if(document.removeEventListener){
+				elem.removeEventListener(eventName, callback, false);
+			} else if(document.attachEvent){
+				elem.detachEvent('on' + eventName, callback);
+			} else {
+				elem['on' + eventName] = null; 
+			}
+		},
+
 		bindEvents: function(){
 			var canvas = this.canvas,
 				container = this.container,
