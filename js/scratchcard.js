@@ -12,7 +12,7 @@
 		this.initialize();
 	}
 
-	// clone an object deeply
+	// Clone an object deeply
 	function clone(obj){
 		// If obj is not an Object instance, return it. Except null and DOM object.
 		if(typeof obj != 'object' || obj == null || obj.nodeType) return obj;
@@ -26,7 +26,7 @@
 		return clonedObj;
 	}
 
-	// extend origin object with default options object 
+	// Extend origin object with default options object 
 	function extend(origin, options){
 		var extendedOpt = clone(options);
 			origin = origin || {};
@@ -86,7 +86,7 @@
 		}
 	}
 
-	// prototype of constructor ScratchCard
+	// Prototype of constructor ScratchCard
 	ScratchCard.prototype = {
 
 		defaults: {
@@ -251,7 +251,7 @@
 			this.canvas.style.color = scratchLayer.color;
 		},
 
-		// get the dom(container, image, canvas) size[{width}, {height}]
+		// Get the dom(container, image, canvas) size[{width}, {height}]
 		// we choosed finally
 		getCurSize: function(options){
 			var size = options.size,
