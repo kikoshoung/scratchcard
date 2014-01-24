@@ -2,7 +2,8 @@
  * @author kikoshoung (kikoshoung@gmail.com)
  */
 (function(){
-	var isPC = ('ontouchstart' in window) ? false : true;
+	var isPC = ('ontouchstart' in window) ? false : true,
+		isIE = (window.navigator.userAgent.indexOf('MSIE'));
 
 	// Constructor of scratch card
 	function ScratchCard(options){
@@ -282,11 +283,9 @@
 			pageX = event.pageX;
 			pageY = event.pageY;
 
-			// For IE8 and older browsers
-			if(pageX === undefined){
+			// For IE
+			if(isIE){
 				pageX = event.clientX + (document.body.scrollLeft || document.documentElement.scrollLeft);
-			}
-			if(pageY === undefined){
 				pageY = event.clientY + (document.body.scrollTop || document.documentElement.scrollTop);
 			}
 
