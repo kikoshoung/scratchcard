@@ -192,7 +192,7 @@
 		setContainer: function(options){
 			var container = options.container,
 				curSize = this.curSize,
-				cssText = container.style.cssText + 'display: inline-block; position: relative; background: transparent;';
+				cssText = 'display: inline-block; position: relative; background: transparent;';
 
 			container.innerHTML = '';
 			container.style.cssText = cssText;
