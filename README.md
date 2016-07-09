@@ -3,7 +3,7 @@ Scratchcard
 
 A scratch card library based on canvas.
 
-***Options
+###Options
 ```js
 defaults: {
     // A wrapper element for scratch card, must be an original dom object
