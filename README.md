@@ -9,7 +9,7 @@ defaults: {
     // A wrapper element for scratch card, must be an original dom object
     container: null,
 
-    // Image src to show a success or failure
+    // Image src, to show a success or failure
     imgSrc: '',
 
     // Card size, [{width}, {height}]
