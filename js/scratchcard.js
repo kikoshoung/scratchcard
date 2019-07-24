@@ -8,6 +8,7 @@
 	// Constructor of scratch card
 	function ScratchCard(options){
 		this.options = options;
+		this.enabled = true;
 		this.scratchActivated = false;
 		this.extendOptions();
 		this.initialize();
@@ -27,7 +28,7 @@
 		return clonedObj;
 	}
 
-	// Extend origin object with default options object 
+	// Extend origin object with default options object
 	function extend(origin, options){
 		var extendedOpt = clone(options);
 			origin = origin || {};
@@ -67,7 +68,7 @@
 		} else if(document.attachEvent){
 			elem.attachEvent('on' + eventName, callback);
 		} else {
-			elem['on' + eventName] = callback; 
+			elem['on' + eventName] = callback;
 		}
 	}
 
@@ -77,7 +78,7 @@
 		} else if(document.detachEvent){
 			elem.detachEvent('on' + eventName, callback);
 		} else {
-			elem['on' + eventName] = null; 
+			elem['on' + eventName] = null;
 		}
 	}
 
@@ -309,7 +310,7 @@
 
 			ctx.globalCompositeOperation = "source-over";
 
-			// Paint canvas to gray 
+			// Paint canvas to gray
 			ctx.fillStyle = scratchLayer.background;
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -324,7 +325,7 @@
 			ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
 			ctx.lineJoin = 'round';
 			ctx.lineCap = 'round';
-			ctx.lineWidth = scratchLayer.lineWidth; 
+			ctx.lineWidth = scratchLayer.lineWidth;
 		},
 
 		bindEvents: function(){
@@ -359,7 +360,7 @@
 		},
 
 		mousemoveHandler: function(e){
-			if(!this.scratchActivated) return;
+			if(!this.enabled || !this.scratchActivated) return;
 
 			var ctx = this.ctx,
 				canvas = this.canvas,
@@ -383,7 +384,7 @@
 
 			this.scratchActivated = false;
 			ctx.closePath();
-			onScratch && onScratch(this.getScratchedPercentage());		
+			onScratch && onScratch(this.getScratchedPercentage());
 			this.isOktoShowAll(this.getScratchedPercentage());
 		},
 
